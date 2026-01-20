@@ -13,29 +13,43 @@
     <!-- CSS Referanser -->
     <link rel="stylesheet" href="style.css">
 </head>
-<body class="day-mode"> <!-- Standard-modus er Day Mode -->
+<body class="day-mode">
 
-    <!-- Hovedcontainer -->
     <div id="app-container">
         
-        <!-- HEADER: Viser status og nattmodus-toggle -->
+        <!-- HEADER -->
         <header id="main-header">
             <div class="header-content">
-                <span id="app-title">HV-SAN <span class="version-tag">v1.0</span></span>
+                <span id="app-title">HV-SAN <span class="version-tag">v1.0.7</span></span>
                 <button id="night-mode-toggle" aria-label="Bytt Nattmodus">
                     <span class="icon">🌙</span>
                 </button>
             </div>
         </header>
 
-        <!-- HOVEDINNHOLD: Her byttes visningene ut dynamisk -->
+        <!-- HOVEDINNHOLD -->
         <main id="content-area">
             
             <!-- HJEM / DASHBOARD -->
             <section id="view-home" class="view active">
                 <div class="welcome-card">
                     <h1>Klar til innsats</h1>
-                    <p>Velg modus basert på situasjonen.</p>
+                    <p>Velg modus og bekreft kompetansenivå.</p>
+                </div>
+
+                <!-- NIVÅVELGER (Ny seksjon) -->
+                <div class="level-selector-container">
+                    <span class="section-label">DITT KOMPETANSENIVÅ:</span>
+                    <div class="level-buttons">
+                        <button id="btn-level-standard" class="level-btn active" data-level="standard">
+                            STANDARD
+                            <small>First Responder</small>
+                        </button>
+                        <button id="btn-level-advanced" class="level-btn" data-level="advanced">
+                            AVANSERT
+                            <small>Nivå 3 / Medic</small>
+                        </button>
+                    </div>
                 </div>
                 
                 <div class="main-actions">
@@ -43,7 +57,7 @@
                         <span class="btn-icon">⚡</span>
                         <div class="btn-text">
                             <span class="title">OPERATIV MODUS</span>
-                            <span class="subtitle">MARCH, 9-Liner, MIST</span>
+                            <span class="subtitle">Start MARCH-behandling</span>
                         </div>
                     </button>
 
@@ -57,31 +71,46 @@
                 </div>
             </section>
 
-            <!-- FELT MODUS (Placeholder for steg 2) -->
+            <!-- FELT MODUS -->
             <section id="view-field" class="view hidden">
                 <div class="view-header">
-                    <button class="back-btn">← TILBAKE</button>
-                    <h2>FELTMODUS</h2>
+                    <button class="back-btn">← AVBRYT</button>
+                    <h2>MARCH-PROSESS</h2>
                 </div>
-                <div id="field-content">
-                    <!-- MARCH-motoren lastes her -->
+                
+                <!-- Statusbar for MARCH-fremgang -->
+                <div id="march-stepper-dots">
+                    <div class="dot active" data-step="M">M</div>
+                    <div class="dot" data-step="A">A</div>
+                    <div class="dot" data-step="R">R</div>
+                    <div class="dot" data-step="C">C</div>
+                    <div class="dot" data-step="H">H</div>
+                </div>
+
+                <div id="field-dynamic-content">
+                    <!-- Her lastes MARCH-stegene og illustrasjoner dynamisk via JS -->
+                    <div class="instruction-box">
+                        <p class="loading-text">Klargjør algoritme for <span id="display-level">standard</span> nivå...</p>
+                    </div>
                 </div>
             </section>
 
-            <!-- TRENINGSMODUS (Placeholder for senere steg) -->
+            <!-- TRENINGSMODUS -->
             <section id="view-training" class="view hidden">
                 <div class="view-header">
                     <button class="back-btn">← TILBAKE</button>
                     <h2>TRENING</h2>
                 </div>
                 <div id="training-content">
-                    <!-- Treningsmoduler lastes her -->
+                    <div class="placeholder-box">
+                        <p>Treningsmoduler under utvikling.</p>
+                    </div>
                 </div>
             </section>
 
         </main>
 
-        <!-- NAVBAR: Navigasjon i bunn for "fat finger" tilgjengelighet -->
+        <!-- NAVBAR -->
         <nav id="bottom-nav">
             <button class="nav-item active" data-target="view-home">
                 <span class="nav-icon">🏠</span>
@@ -99,7 +128,7 @@
 
     </div>
 
-    <!-- System-logg overlay (valgfritt, for debugging i felt) -->
+    <!-- System-logg overlay -->
     <div id="debug-log-container" class="hidden">
         <div class="log-header">System Log <button id="close-log">X</button></div>
         <div id="debug-log-content"></div>
@@ -109,4 +138,4 @@
     <script src="script.js"></script>
 </body>
 </html>
-<!-- Version: #1 -->
+<!-- Version: #7 -->
