@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>HV-SanApp | Operativ Sanitet</title>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#1a1a1a">
+
+    <!-- CSS Referanser -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="day-mode"> <!-- Standard-modus er Day Mode -->
+
+    <!-- Hovedcontainer -->
+    <div id="app-container">
+        
+        <!-- HEADER: Viser status og nattmodus-toggle -->
+        <header id="main-header">
+            <div class="header-content">
+                <span id="app-title">HV-SAN <span class="version-tag">v1.0</span></span>
+                <button id="night-mode-toggle" aria-label="Bytt Nattmodus">
+                    <span class="icon">🌙</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- HOVEDINNHOLD: Her byttes visningene ut dynamisk -->
+        <main id="content-area">
+            
+            <!-- HJEM / DASHBOARD -->
+            <section id="view-home" class="view active">
+                <div class="welcome-card">
+                    <h1>Klar til innsats</h1>
+                    <p>Velg modus basert på situasjonen.</p>
+                </div>
+                
+                <div class="main-actions">
+                    <button id="btn-start-field" class="action-card field-btn">
+                        <span class="btn-icon">⚡</span>
+                        <div class="btn-text">
+                            <span class="title">OPERATIV MODUS</span>
+                            <span class="subtitle">MARCH, 9-Liner, MIST</span>
+                        </div>
+                    </button>
+
+                    <button id="btn-start-training" class="action-card training-btn">
+                        <span class="btn-icon">📖</span>
+                        <div class="btn-text">
+                            <span class="title">TRENINGSMODUS</span>
+                            <span class="subtitle">Micro-learning & Quiz</span>
+                        </div>
+                    </button>
+                </div>
+            </section>
+
+            <!-- FELT MODUS (Placeholder for steg 2) -->
+            <section id="view-field" class="view hidden">
+                <div class="view-header">
+                    <button class="back-btn">← TILBAKE</button>
+                    <h2>FELTMODUS</h2>
+                </div>
+                <div id="field-content">
+                    <!-- MARCH-motoren lastes her -->
+                </div>
+            </section>
+
+            <!-- TRENINGSMODUS (Placeholder for senere steg) -->
+            <section id="view-training" class="view hidden">
+                <div class="view-header">
+                    <button class="back-btn">← TILBAKE</button>
+                    <h2>TRENING</h2>
+                </div>
+                <div id="training-content">
+                    <!-- Treningsmoduler lastes her -->
+                </div>
+            </section>
+
+        </main>
+
+        <!-- NAVBAR: Navigasjon i bunn for "fat finger" tilgjengelighet -->
+        <nav id="bottom-nav">
+            <button class="nav-item active" data-target="view-home">
+                <span class="nav-icon">🏠</span>
+                <span class="nav-label">Hjem</span>
+            </button>
+            <button class="nav-item" data-target="view-field">
+                <span class="nav-icon">🚑</span>
+                <span class="nav-label">Felt</span>
+            </button>
+            <button class="nav-item" data-target="view-training">
+                <span class="nav-icon">🎓</span>
+                <span class="nav-label">Trening</span>
+            </button>
+        </nav>
+
+    </div>
+
+    <!-- System-logg overlay (valgfritt, for debugging i felt) -->
+    <div id="debug-log-container" class="hidden">
+        <div class="log-header">System Log <button id="close-log">X</button></div>
+        <div id="debug-log-content"></div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="script.js"></script>
+</body>
+</html>
+<!-- Version: #1 -->
