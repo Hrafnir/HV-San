@@ -1,4 +1,4 @@
-/* Version: #9 */
+/* Version: #11 */
 
 // === GLOBALE KONSTANTER OG STATE ===
 const AppState = {
@@ -6,10 +6,10 @@ const AppState = {
     isNightMode: false,
     userLevel: 'standard',
     currentMarchStep: 'M',
-    version: '1.0.9',
+    version: '1.0.11',
     patientData: {
         startTime: null,
-        tourniquets: [], // Liste med { id, location, time, timerInterval }
+        tourniquets: [], // Liste med { id, location, startTime, formattedTime }
         respirationRate: null,
         consciousness: null,
         interventions: []
@@ -60,12 +60,12 @@ window.addTourniquet = function(location) {
     AppState.patientData.tourniquets.push(newTQ);
     sysLog(`TOURNIQUET PÅSATT: ${location} kl. ${newTQ.formattedTime}`, 'WARN');
     
-    // Oppdater visningen umiddelbart
+    // Oppdater visningen umiddelbart for å vise det nye kortet
     renderMarchStep('M');
 };
 
 /**
- * Oppdaterer alle aktive timere i UI hvert sekund
+ * Oppdaterer alle aktive timere i UI hvert sekund uten å re-rendre hele MARCH-steget
  */
 setInterval(() => {
     const timerDisplays = document.querySelectorAll('.tq-duration');
@@ -98,7 +98,7 @@ function renderMarchStep(step) {
                     <p class="step-instruction">Sjekk ekstremiteter. Påfør tourniquet ved behov.</p>
                     
                     <div class="procedure-image-container">
-                        <img src="/image/tourniquet.png" alt="Tourniquet Instruksjon" class="procedure-img">
+                        <img src="image/tourniquet.png" alt="Tourniquet Instruksjon" class="procedure-img">
                         <p class="img-caption">Instruksjon: High and Tight</p>
                     </div>
 
@@ -189,8 +189,12 @@ function startMarchSession() {
 // === GENERELLE FUNKSJONER ===
 function setLevel(level) {
     AppState.userLevel = level;
-    document.getElementById('btn-level-standard').classList.toggle('active', level === 'standard');
-    document.getElementById('btn-level-advanced').classList.toggle('active', level === 'advanced');
+    // Sikrer at vi ikke krasjer hvis elementene ikke er i DOM ennå
+    const btnStd = document.getElementById('btn-level-standard');
+    const btnAdv = document.getElementById('btn-level-advanced');
+    if (btnStd) btnStd.classList.toggle('active', level === 'standard');
+    if (btnAdv) btnAdv.classList.toggle('active', level === 'advanced');
+    
     localStorage.setItem('hv_user_level', level);
     sysLog(`Nivå endret til ${level}`);
 }
@@ -204,14 +208,26 @@ function toggleNightMode() {
 }
 
 function setupEventListeners() {
-    document.getElementById('night-mode-toggle').addEventListener('click', toggleNightMode);
-    document.getElementById('btn-level-standard').addEventListener('click', () => setLevel('standard'));
-    document.getElementById('btn-level-advanced').addEventListener('click', () => setLevel('advanced'));
+    const nightToggle = document.getElementById('night-mode-toggle');
+    if (nightToggle) nightToggle.addEventListener('click', toggleNightMode);
+
+    const btnStd = document.getElementById('btn-level-standard');
+    const btnAdv = document.getElementById('btn-level-advanced');
+    if (btnStd) btnStd.addEventListener('click', () => setLevel('standard'));
+    if (btnAdv) btnAdv.addEventListener('click', () => setLevel('advanced'));
+
     navItems.forEach(item => item.addEventListener('click', () => switchView(item.getAttribute('data-target'))));
-    document.getElementById('btn-start-field').addEventListener('click', () => switchView('view-field'));
-    document.getElementById('btn-start-training').addEventListener('click', () => switchView('view-training'));
+    
+    const btnField = document.getElementById('btn-start-field');
+    if (btnField) btnField.addEventListener('click', () => switchView('view-field'));
+    
+    const btnTraining = document.getElementById('btn-start-training');
+    if (btnTraining) btnTraining.addEventListener('click', () => switchView('view-training'));
+
     document.querySelectorAll('.back-btn').forEach(btn => btn.addEventListener('click', () => switchView('view-home')));
-    document.getElementById('close-log').addEventListener('click', () => document.getElementById('debug-log-container').classList.add('hidden'));
+    
+    const closeLog = document.getElementById('close-log');
+    if (closeLog) closeLog.addEventListener('click', () => document.getElementById('debug-log-container').classList.add('hidden'));
 }
 
 function initApp() {
@@ -225,4 +241,4 @@ function initApp() {
 
 document.addEventListener('DOMContentLoaded', initApp);
 
-/* Version: #9 */
+/* Version: #11 */
