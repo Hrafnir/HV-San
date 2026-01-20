@@ -1,4 +1,4 @@
-/* Version: #8 */
+/* Version: #10 */
 
 /* === SYSTEM-VARIABLER OG TEMAER === */
 :root {
@@ -20,7 +20,7 @@
     --large-tap-area: 72px;
 }
 
-/* Tactical Night Mode */
+/* Tactical Night Mode - Rød/Sort */
 body.night-mode {
     --bg-primary: #000000;
     --bg-secondary: #000000;
@@ -117,26 +117,17 @@ html, body {
     padding-bottom: 100px;
 }
 
-.view {
-    display: none;
-}
+.view { display: none; }
+.view.active { display: block; }
 
-.view.active {
-    display: block;
-}
-
-/* === HJEM / DASHBOARD === */
+/* === DASHBOARD === */
 .welcome-card h1 {
     font-size: 1.8rem;
     font-weight: 800;
     margin-bottom: 5px;
 }
 
-/* Nivåvelger */
-.level-selector-container {
-    margin: 20px 0;
-}
-
+.level-selector-container { margin: 20px 0; }
 .section-label {
     display: block;
     font-size: 0.75rem;
@@ -159,32 +150,16 @@ html, body {
     border-radius: var(--border-radius);
     cursor: pointer;
     font-weight: 800;
-    text-align: center;
 }
 
-.level-btn small {
-    display: block;
-    font-size: 0.65rem;
-    font-weight: 400;
-}
-
+.level-btn small { display: block; font-size: 0.65rem; font-weight: 400; }
 .level-btn.active {
     background: var(--accent-color);
     color: #fff;
     border-color: var(--accent-color);
 }
 
-body.night-mode .level-btn.active {
-    background: var(--text-primary);
-    color: #000;
-    border-color: var(--text-primary);
-}
-
-.main-actions {
-    display: grid;
-    gap: 15px;
-}
-
+.main-actions { display: grid; gap: 15px; }
 .action-card {
     display: flex;
     align-items: center;
@@ -194,20 +169,15 @@ body.night-mode .level-btn.active {
     background-color: var(--bg-secondary);
     color: var(--text-primary);
     box-shadow: var(--card-shadow);
-    text-align: left;
-    min-height: 100px;
 }
 
 .btn-icon { font-size: 2rem; margin-right: 15px; }
 .btn-text .title { font-size: 1.1rem; font-weight: 800; display: block; }
-.btn-text .subtitle { font-size: 0.8rem; opacity: 0.7; }
-
 body.day-mode .field-btn { border-left: 8px solid var(--danger-color); }
 body.day-mode .training-btn { border-left: 8px solid var(--accent-color); }
 
-/* === MARCH SYSTEMET (OPERATIV MODUS) === */
+/* === MARCH SYSTEMET === */
 
-/* Stepper (Dots) */
 #march-stepper-dots {
     display: flex;
     justify-content: space-between;
@@ -226,24 +196,109 @@ body.day-mode .training-btn { border-left: 8px solid var(--accent-color); }
     justify-content: center;
     font-weight: 900;
     color: var(--text-secondary);
-    transition: all 0.2s ease;
 }
 
 #march-stepper-dots .dot.active {
     background: var(--danger-color);
     color: white;
     border-color: var(--danger-color);
-    transform: scale(1.1);
     box-shadow: 0 0 15px rgba(168, 35, 35, 0.4);
 }
 
-body.night-mode #march-stepper-dots .dot.active {
-    background: var(--text-primary);
-    color: #000;
-    border-color: var(--text-primary);
+/* === PROCEDYRE VISUALISERING === */
+.procedure-image-container {
+    background: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 20px;
+    border: 1px solid rgba(0,0,0,0.1);
 }
 
-/* MARCH Kort */
+.procedure-img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.img-caption {
+    background: var(--text-primary);
+    color: var(--bg-primary);
+    padding: 5px 10px;
+    font-size: 0.75rem;
+    font-weight: bold;
+    text-align: center;
+}
+
+/* === TOURNIQUET VELGER (Limb selection) === */
+.tq-selection-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.tq-btn {
+    padding: 15px 5px;
+    background: var(--bg-secondary);
+    border: 2px solid var(--danger-color);
+    color: var(--danger-color);
+    border-radius: 8px;
+    font-weight: 900;
+    font-size: 0.9rem;
+    cursor: pointer;
+    text-transform: uppercase;
+}
+
+.tq-btn:active {
+    background: var(--danger-color);
+    color: #fff;
+}
+
+/* === AKTIVE TIMERE (Timer Cards) === */
+#active-tourniquets {
+    margin-bottom: 25px;
+}
+
+.list-label {
+    font-size: 0.7rem;
+    font-weight: 900;
+    color: var(--text-secondary);
+    margin-bottom: 10px;
+    text-transform: uppercase;
+}
+
+.tq-status-card {
+    background: var(--nav-bg);
+    color: var(--nav-text);
+    padding: 12px 15px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from { opacity: 0; transform: translateX(-10px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+.tq-loc { font-weight: 900; font-size: 1rem; }
+.tq-start { font-size: 0.75rem; opacity: 0.8; }
+.tq-duration {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 1.4rem;
+    font-weight: 900;
+    color: #fff;
+    background: rgba(255,255,255,0.1);
+    padding: 2px 8px;
+    border-radius: 4px;
+}
+
+body.night-mode .tq-duration { color: var(--text-primary); }
+
+/* === GENERELLE MARCH ELEMENTER === */
 .march-card {
     background: var(--bg-secondary);
     border-radius: var(--border-radius);
@@ -257,34 +312,11 @@ body.night-mode #march-stepper-dots .dot.active {
     font-weight: 900;
     margin-bottom: 5px;
     color: var(--danger-color);
-    text-transform: uppercase;
 }
 
-.step-instruction {
-    font-weight: 600;
-    margin-bottom: 20px;
-    font-size: 0.95rem;
-}
-
-/* Illustrasjoner */
-.illustration-placeholder {
-    background: rgba(0,0,0,0.05);
-    border: 2px dashed var(--text-secondary);
-    border-radius: 8px;
-    padding: 20px;
-    text-align: center;
-    margin-bottom: 20px;
-}
-
-body.night-mode .illustration-placeholder {
-    background: rgba(255,0,0,0.1);
-    border-color: var(--text-primary);
-}
-
-/* Knapper i MARCH */
 .march-action-btn {
     width: 100%;
-    padding: 20px;
+    padding: 18px;
     font-size: 1.1rem;
     font-weight: 800;
     border: none;
@@ -292,46 +324,29 @@ body.night-mode .illustration-placeholder {
     background: var(--danger-color);
     color: white;
     cursor: pointer;
-    margin-bottom: 15px;
-    text-transform: uppercase;
+    margin-top: 10px;
 }
 
-.march-action-btn.secondary {
-    background: var(--advanced-color);
-}
+.march-action-btn.secondary { background: var(--advanced-color); }
 
-/* Puls-animasjon for kritiske knapper */
-.pulse {
-    animation: pulse-red 2s infinite;
-}
-
-@keyframes pulse-red {
-    0% { box-shadow: 0 0 0 0 rgba(168, 35, 35, 0.7); }
-    70% { box-shadow: 0 0 0 15px rgba(168, 35, 35, 0); }
-    100% { box-shadow: 0 0 0 0 rgba(168, 35, 35, 0); }
-}
-
-/* Avansert Seksjon */
 .advanced-section {
-    margin-top: 15px;
+    margin-top: 20px;
     padding-top: 15px;
-    border-top: 2px solid var(--bg-primary);
+    border-top: 2px dashed var(--bg-primary);
 }
 
 .adv-label {
-    font-size: 0.7rem;
+    font-size: 0.75rem;
     font-weight: 900;
     color: var(--advanced-color);
-    margin-bottom: 8px;
-    text-transform: uppercase;
+    margin-bottom: 10px;
 }
 
-/* Navigasjon mellom steg */
 .nav-buttons {
     display: grid;
     grid-template-columns: 1fr 1.5fr;
     gap: 10px;
-    margin-top: 20px;
+    margin-top: 25px;
 }
 
 .next-step-btn {
@@ -341,7 +356,6 @@ body.night-mode .illustration-placeholder {
     border: none;
     border-radius: 8px;
     font-weight: 800;
-    cursor: pointer;
 }
 
 .back-step-btn {
@@ -351,7 +365,6 @@ body.night-mode .illustration-placeholder {
     border: 1px solid var(--text-primary);
     border-radius: 8px;
     font-weight: 800;
-    cursor: pointer;
 }
 
 /* === BUNN-NAVIGASJON === */
@@ -386,7 +399,26 @@ body.night-mode .illustration-placeholder {
 .nav-icon { font-size: 1.5rem; }
 .nav-label { font-size: 0.7rem; font-weight: bold; }
 
-/* === HJELPE-KLASSER === */
+/* === DEBUG OG HJELPEKLASSER === */
 .hidden { display: none !important; }
 
-/* Version: #8 */
+#debug-log-container {
+    position: fixed;
+    bottom: 90px;
+    left: 10px;
+    right: 10px;
+    height: 150px;
+    background: rgba(0,0,0,0.9);
+    color: #00ff00;
+    font-family: monospace;
+    font-size: 0.75rem;
+    padding: 10px;
+    border-radius: 8px;
+    z-index: 2000;
+    overflow-y: auto;
+}
+
+.log-entry.warn { color: #ffae00; }
+.log-entry.error { color: #ff0000; font-weight: bold; }
+
+/* Version: #10 */
