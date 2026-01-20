@@ -1,4 +1,4 @@
-/* Version: #11 */
+/* Version: #13 */
 
 // === GLOBALE KONSTANTER OG STATE ===
 const AppState = {
@@ -6,10 +6,10 @@ const AppState = {
     isNightMode: false,
     userLevel: 'standard',
     currentMarchStep: 'M',
-    version: '1.0.11',
+    version: '1.0.13',
     patientData: {
         startTime: null,
-        tourniquets: [], // Liste med { id, location, startTime, formattedTime }
+        tourniquets: [], // { id, location, startTime, formattedTime }
         respirationRate: null,
         consciousness: null,
         interventions: []
@@ -38,6 +38,7 @@ function sysLog(message, level = 'INFO') {
 
 // === HJELPEFUNKSJONER ===
 function formatDuration(startTime) {
+    if (!startTime) return "0:00";
     const now = new Date();
     const diff = Math.floor((now - startTime) / 1000);
     const min = Math.floor(diff / 60);
@@ -45,7 +46,7 @@ function formatDuration(startTime) {
     return `${min}:${sec.toString().padStart(2, '0')}`;
 }
 
-// === TOURNIQUET LOGIKK (MULTIPLE TIMERE) ===
+// === TOURNIQUET LOGIKK ===
 window.addTourniquet = function(location) {
     const now = new Date();
     const id = Date.now();
@@ -60,13 +61,10 @@ window.addTourniquet = function(location) {
     AppState.patientData.tourniquets.push(newTQ);
     sysLog(`TOURNIQUET PÅSATT: ${location} kl. ${newTQ.formattedTime}`, 'WARN');
     
-    // Oppdater visningen umiddelbart for å vise det nye kortet
     renderMarchStep('M');
 };
 
-/**
- * Oppdaterer alle aktive timere i UI hvert sekund uten å re-rendre hele MARCH-steget
- */
+// Timer-oppdatering (kjører i bakgrunnen)
 setInterval(() => {
     const timerDisplays = document.querySelectorAll('.tq-duration');
     timerDisplays.forEach(display => {
@@ -83,99 +81,106 @@ function renderMarchStep(step) {
     AppState.currentMarchStep = step;
     sysLog(`Renderer MARCH steg: ${step} (${AppState.userLevel})`);
 
+    // Oppdater stepper-prikker
     const dots = document.querySelectorAll('#march-stepper-dots .dot');
     dots.forEach(dot => {
         dot.classList.toggle('active', dot.getAttribute('data-step') === step);
     });
 
-    let html = '';
-
-    switch(step) {
-        case 'M':
-            html = `
-                <div class="march-card">
-                    <h3 class="step-title">MASSIVE HEMORRHAGE</h3>
-                    <p class="step-instruction">Sjekk ekstremiteter. Påfør tourniquet ved behov.</p>
-                    
-                    <div class="procedure-image-container">
-                        <img src="image/tourniquet.png" alt="Tourniquet Instruksjon" class="procedure-img">
-                        <p class="img-caption">Instruksjon: High and Tight</p>
-                    </div>
-
-                    <div class="tq-selection-grid">
-                        <button class="tq-btn" onclick="addTourniquet('Høyre Arm')">H. ARM</button>
-                        <button class="tq-btn" onclick="addTourniquet('Venstre Arm')">V. ARM</button>
-                        <button class="tq-btn" onclick="addTourniquet('Høyre Bein')">H. BEIN</button>
-                        <button class="tq-btn" onclick="addTourniquet('Venstre Bein')">V. BEIN</button>
-                    </div>
-
-                    <div id="active-tourniquets">
-                        ${AppState.patientData.tourniquets.length > 0 ? '<p class="list-label">AKTIVE TOURNIQUETER:</p>' : ''}
-                        ${AppState.patientData.tourniquets.map(tq => `
-                            <div class="tq-status-card">
-                                <span class="tq-loc">${tq.location}</span>
-                                <span class="tq-start">Satt: ${tq.formattedTime}</span>
-                                <span class="tq-duration" data-tq-id="${tq.id}">0:00</span>
-                            </div>
-                        `).join('')}
-                    </div>
-
-                    ${AppState.userLevel === 'advanced' ? 
-                        `<div class="advanced-section">
-                            <p class="adv-label">AVANSERT (Nivå 3):</p>
-                            <button class="march-action-btn secondary" onclick="sysLog('Sårpakking logget')">SÅRPAKKING / TRYKK</button>
-                         </div>` : ''
-                    }
-
-                    <button class="next-step-btn" onclick="renderMarchStep('A')">NESTE: AIRWAY (A) →</button>
-                </div>
-            `;
-            break;
-        
-        case 'A':
-            html = `
-                <div class="march-card">
-                    <h3 class="step-title">AIRWAY (A)</h3>
-                    <div class="check-list">
-                        <label class="check-item"><input type="checkbox" onchange="sysLog('A: Snakker sjekket')"> Snakker pasienten?</label>
-                        <label class="check-item"><input type="checkbox" onchange="sysLog('A: Munn sjekket')"> Sjekk munn for fremmedlegemer</label>
-                    </div>
-                    <div class="action-buttons-grid">
-                        <button class="march-action-btn" onclick="sysLog('Stabilt sideleie utført')">STABILT SIDELEIE</button>
-                    </div>
-                    ${AppState.userLevel === 'advanced' ? 
-                        `<div class="advanced-section">
-                            <p class="adv-label">AVANSERT (Nivå 3):</p>
-                            <button class="march-action-btn secondary" onclick="sysLog('NPA påsatt')">NESEKANTARELL (NPA)</button>
-                         </div>` : ''
-                    }
-                    <div class="nav-buttons">
-                        <button class="back-step-btn" onclick="renderMarchStep('M')">← TILBAKE</button>
-                        <button class="next-step-btn" onclick="renderMarchStep('R')">NESTE: RESPIRATION (R) →</button>
-                    </div>
-                </div>
-            `;
-            break;
-
-        default:
-            html = `<div class="march-card">
-                        <h3>Steg ${step}</h3>
-                        <p>Under utvikling...</p>
-                        <button class="back-step-btn" onclick="renderMarchStep('A')">← TILBAKE</button>
-                    </div>`;
+    const targetContainer = document.getElementById('field-dynamic-content');
+    if (!targetContainer) {
+        sysLog("FEIL: Fant ikke field-dynamic-content container!", "ERROR");
+        return;
     }
 
-    fieldDynamicContent.innerHTML = html;
+    let html = '';
+
+    if (step === 'M') {
+        html = `
+            <div class="march-card">
+                <h3 class="step-title">MASSIVE HEMORRHAGE</h3>
+                <p class="step-instruction">Stans store blødninger umiddelbart!</p>
+                
+                <div class="procedure-image-container">
+                    <img src="image/tourniquet.png" alt="Instruksjon" class="procedure-img" onerror="this.parentElement.innerHTML='<p style=padding:20px;color:red;>Bilde ikke funnet: image/tourniquet.png</p>'">
+                    <p class="img-caption">Instruksjon: High and Tight</p>
+                </div>
+
+                <div class="tq-selection-grid">
+                    <button class="tq-btn" onclick="addTourniquet('Høyre Arm')">H. ARM</button>
+                    <button class="tq-btn" onclick="addTourniquet('Venstre Arm')">V. ARM</button>
+                    <button class="tq-btn" onclick="addTourniquet('Høyre Bein')">H. BEIN</button>
+                    <button class="tq-btn" onclick="addTourniquet('Venstre Bein')">V. BEIN</button>
+                </div>
+
+                <div id="active-tourniquets">
+                    ${AppState.patientData.tourniquets.length > 0 ? '<p class="list-label">AKTIVE TOURNIQUETER:</p>' : ''}
+                    ${AppState.patientData.tourniquets.map(tq => `
+                        <div class="tq-status-card">
+                            <span class="tq-loc">${tq.location}</span>
+                            <span class="tq-start">Satt: ${tq.formattedTime}</span>
+                            <span class="tq-duration" data-tq-id="${tq.id}">0:00</span>
+                        </div>
+                    `).join('')}
+                </div>
+
+                ${AppState.userLevel === 'advanced' ? `
+                    <div class="advanced-section">
+                        <p class="adv-label">AVANSERT TILTAK:</p>
+                        <button class="march-action-btn secondary" onclick="sysLog('Sårpakking logget')">SÅRPAKKING / TRYKK</button>
+                    </div>
+                ` : ''}
+
+                <button class="next-step-btn" onclick="renderMarchStep('A')">NESTE: AIRWAY (A) →</button>
+            </div>
+        `;
+    } else if (step === 'A') {
+        html = `
+            <div class="march-card">
+                <h3 class="step-title">AIRWAY (A)</h3>
+                <div class="check-list">
+                    <label class="check-item"><input type="checkbox"> Snakker pasienten?</label>
+                    <label class="check-item"><input type="checkbox"> Sjekk munn/svelg</label>
+                </div>
+                <button class="march-action-btn" onclick="sysLog('Sideleie utført')">STABILT SIDELEIE</button>
+                <div class="nav-buttons">
+                    <button class="back-step-btn" onclick="renderMarchStep('M')">← TILBAKE</button>
+                    <button class="next-step-btn" onclick="renderMarchStep('R')">NESTE: RESPIRATION (R) →</button>
+                </div>
+            </div>
+        `;
+    } else {
+        html = `<div class="march-card"><h3>Steg ${step}</h3><p>Kommer snart...</p><button class="back-step-btn" onclick="renderMarchStep('M')">← TILBAKE</button></div>`;
+    }
+
+    targetContainer.innerHTML = html;
 }
 
 // === NAVIGASJONS-LOGIKK ===
 function switchView(viewId) {
     sysLog(`Navigerer til: ${viewId}`);
-    views.forEach(v => v.classList.toggle('active', v.id === viewId));
+    
+    let found = false;
+    views.forEach(v => {
+        if (v.id === viewId) {
+            v.classList.add('active');
+            found = true;
+        } else {
+            v.classList.remove('active');
+        }
+    });
+
+    if (!found) {
+        sysLog(`Kritisk feil: Visning ${viewId} finnes ikke!`, "ERROR");
+        return;
+    }
+
     navItems.forEach(i => i.classList.toggle('active', i.getAttribute('data-target') === viewId));
     AppState.currentView = viewId;
-    if (viewId === 'view-field') startMarchSession();
-    document.getElementById('content-area').scrollTop = 0;
+
+    if (viewId === 'view-field') {
+        startMarchSession();
+    }
 }
 
 function startMarchSession() {
@@ -186,15 +191,13 @@ function startMarchSession() {
     renderMarchStep('M');
 }
 
-// === GENERELLE FUNKSJONER ===
+// === GLOBALE FUNKSJONER ===
 function setLevel(level) {
     AppState.userLevel = level;
-    // Sikrer at vi ikke krasjer hvis elementene ikke er i DOM ennå
     const btnStd = document.getElementById('btn-level-standard');
     const btnAdv = document.getElementById('btn-level-advanced');
     if (btnStd) btnStd.classList.toggle('active', level === 'standard');
     if (btnAdv) btnAdv.classList.toggle('active', level === 'advanced');
-    
     localStorage.setItem('hv_user_level', level);
     sysLog(`Nivå endret til ${level}`);
 }
@@ -207,38 +210,40 @@ function toggleNightMode() {
     sysLog(`Nattmodus: ${AppState.isNightMode}`);
 }
 
+// === INITIALISERING ===
 function setupEventListeners() {
-    const nightToggle = document.getElementById('night-mode-toggle');
-    if (nightToggle) nightToggle.addEventListener('click', toggleNightMode);
+    const nt = document.getElementById('night-mode-toggle');
+    if (nt) nt.addEventListener('click', toggleNightMode);
 
-    const btnStd = document.getElementById('btn-level-standard');
-    const btnAdv = document.getElementById('btn-level-advanced');
-    if (btnStd) btnStd.addEventListener('click', () => setLevel('standard'));
-    if (btnAdv) btnAdv.addEventListener('click', () => setLevel('advanced'));
+    const bS = document.getElementById('btn-level-standard');
+    const bA = document.getElementById('btn-level-advanced');
+    if (bS) bS.addEventListener('click', () => setLevel('standard'));
+    if (bA) bA.addEventListener('click', () => setLevel('advanced'));
 
-    navItems.forEach(item => item.addEventListener('click', () => switchView(item.getAttribute('data-target'))));
-    
-    const btnField = document.getElementById('btn-start-field');
-    if (btnField) btnField.addEventListener('click', () => switchView('view-field'));
-    
-    const btnTraining = document.getElementById('btn-start-training');
-    if (btnTraining) btnTraining.addEventListener('click', () => switchView('view-training'));
+    const bF = document.getElementById('btn-start-field');
+    if (bF) bF.addEventListener('click', () => switchView('view-field'));
 
-    document.querySelectorAll('.back-btn').forEach(btn => btn.addEventListener('click', () => switchView('view-home')));
-    
-    const closeLog = document.getElementById('close-log');
-    if (closeLog) closeLog.addEventListener('click', () => document.getElementById('debug-log-container').classList.add('hidden'));
+    const bT = document.getElementById('btn-start-training');
+    if (bT) bT.addEventListener('click', () => switchView('view-training'));
+
+    navItems.forEach(item => {
+        item.addEventListener('click', () => switchView(item.getAttribute('data-target')));
+    });
+
+    document.querySelectorAll('.back-btn').forEach(btn => {
+        btn.addEventListener('click', () => switchView('view-home'));
+    });
 }
 
 function initApp() {
-    sysLog(`HV-SanApp v${AppState.version} initialiserer...`);
+    sysLog(`HV-SanApp v${AppState.version} starter...`);
     if (localStorage.getItem('hv_night_mode') === 'true') toggleNightMode();
-    const savedLevel = localStorage.getItem('hv_user_level');
-    setLevel(savedLevel || 'standard');
+    const savedLvl = localStorage.getItem('hv_user_level');
+    setLevel(savedLvl || 'standard');
     setupEventListeners();
     switchView('view-home');
 }
 
 document.addEventListener('DOMContentLoaded', initApp);
 
-/* Version: #11 */
+/* Version: #13 */
